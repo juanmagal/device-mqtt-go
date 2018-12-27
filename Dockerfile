@@ -12,16 +12,32 @@ RUN echo http://nl.alpinelinux.org/alpine/v3.7/main > /etc/apk/repositories; \
     echo http://nl.alpinelinux.org/alpine/v3.7/community >> /etc/apk/repositories
 
 RUN apk update && apk add make && apk add bash
-RUN apk add curl && apk add git && apk add openssh && apk add build-base
+RUN apk add curl && apk add git && apk add openssh && apk add build-base && apk add tree
 
-ADD getglide.sh .
+RUN pwd
+
+ADD device-mqtt-go/getglide.sh .
 RUN sh ./getglide.sh
 # set the working directory
 WORKDIR $GOPATH/src/github.com/edgexfoundry/device-mqtt-go
 
-COPY . .
+COPY ./device-mqtt-go .
+ADD ./edgex-go/ ../edgex-go/
+ADD ./device-sdk-go/ ../device-sdk-go/
 
-RUN make prepare
+
+RUN go get github.com/BurntSushi/toml
+RUN go get github.com/cisco/senml
+RUN go get github.com/eclipse/paho.mqtt.golang
+RUN go get github.com/globalsign/mgo/bson
+RUN go get github.com/go-kit/kit/log
+RUN go get gopkg.in/mgo.v2/bson
+RUN go get github.com/google/uuid
+RUN go get github.com/gorilla/mux
+RUN go get github.com/hashicorp/consul/api
+RUN go get github.com/robfig/cron
+RUN go get gopkg.in/yaml.v2
+
 RUN make build
 
 

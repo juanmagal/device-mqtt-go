@@ -39,7 +39,7 @@ run:
 docker: $(DOCKERS)
 
 docker_device_mqtt_go:
-	docker build \
+	docker build  \
 		--label "git_sha=$(GIT_SHA)" \
 		-t edgexfoundry/docker-device-mqtt-go:$(GIT_SHA) \
 		-t edgexfoundry/docker-device-mqtt-go:$(VERSION)-dev \
