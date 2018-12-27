@@ -8,8 +8,8 @@ package main
 
 import (
 	"github.com/edgexfoundry/device-mqtt-go"
-	"github.com/edgexfoundry/device-mqtt-go/internal/driver"
 	"github.com/edgexfoundry/device-sdk-go/pkg/startup"
+	"github.com/edgexfoundry/device-mqtt-go/internal/driver"
 )
 
 const (
