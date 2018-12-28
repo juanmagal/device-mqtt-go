@@ -1,6 +1,6 @@
 [Incoming]
 Protocol = "tcp"
-Host = "0.0.0.0"
+Host = "mosquitto"
 Port = 1883
 Username = "admin"
 Password = "public"
@@ -11,7 +11,7 @@ Topic = "DataTopic"
 
 [Response]
 Protocol = "tcp"
-Host = "0.0.0.0"
+Host = "mosquitto"
 Port = 1883
 Username = "admin"
 Password = "public"

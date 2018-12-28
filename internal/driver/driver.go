@@ -289,6 +289,7 @@ func createClient(clientID string, uri *url.URL, keepAlive int) (MQTT.Client, er
 	client := MQTT.NewClient(opts)
 	token := client.Connect()
 	if token.Wait() && token.Error() != nil {
+		driver.Logger.Warn(fmt.Sprintf("Connection Error : %v", token.Error()))
 		return client, token.Error()
 	}
 
