@@ -47,11 +47,16 @@ func startIncomingListening() error {
 	}
 
 	client, err := createClient(mqttClientId, uri, keepAlive)
-	defer client.Disconnect(5000)
 	if err != nil {
 		driver.Logger.Warn(fmt.Sprintf("[Incoming listener] Failed to create MQTT Client"))
 		return err
 	}
+
+	defer func() {
+		if client.IsConnected() {
+			client.Disconnect(5000)
+		}
+	}()
 
 	token := client.Subscribe(topic, qos, onIncomingDataReceived)
 	if token.Wait() && token.Error() != nil {
