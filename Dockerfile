@@ -16,12 +16,16 @@ RUN apk add curl && apk add git && apk add openssh && apk add build-base && apk 
 
 RUN pwd
 
-ADD device-mqtt-go/getglide.sh .
+ADD ./device-mqtt-go/getglide.sh .
 RUN sh ./getglide.sh
 # set the working directory
 WORKDIR $GOPATH/src/github.com/edgexfoundry/device-mqtt-go
 
-COPY ./device-mqtt-go .
+COPY ./device-mqtt-go/ .
+RUN ls -la
+RUN pwd
+
+
 ADD ./edgex-go/ ../edgex-go/
 ADD ./device-sdk-go/ ../device-sdk-go/
 

@@ -134,7 +134,7 @@ func executeIncomingDataReceived (reading MqttReading) {
 
 	service := sdk.RunningService()
 
-	deviceObject, ok := service.DeviceObject(reading.DeviceName, reading.Operation, "get")
+	deviceObject, ok := service.DeviceResource(reading.DeviceName, reading.Operation, "get")
 
 	if !ok {
 		driver.Logger.Warn(fmt.Sprintf("[Incoming listener] Incoming reading ignored. No DeviceObject found"))

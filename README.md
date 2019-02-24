@@ -1,6 +1,8 @@
 # Device MQTT Go
 MQTT device service go version. The design is base on [ document](https://github.com/edgexfoundry/edgex-go/blob/master/docs/examples/Ch-ExamplesMQTTDeviceService.rst) .
 
+In order to generate Docker image, move Dockerfile to the parent directory and execute docker build there.
+
 ## Requisite
 * core-data
 * core-metadata
