@@ -9,10 +9,8 @@ package driver
 import (
 	"encoding/json"
 	"fmt"
-	"math"
 	"net/url"
 	"reflect"
-	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -301,7 +299,7 @@ func newResult(deviceObject models.DeviceResource, ro models.ResourceOperation, 
 	var err error
 	var resTime = time.Now().UnixNano() / int64(time.Millisecond)
 	var profileValueType = strings.ToLower(deviceObject.Properties.Value.Type)
-	var readingValueType = reflect.TypeOf(reading).String()
+	var readingValueType = strings.ToLower(reflect.TypeOf(reading).String())
 
 	if readingValueType == "int" {
 		reading = int64(reading.(int))
@@ -319,7 +317,7 @@ func newResult(deviceObject models.DeviceResource, ro models.ResourceOperation, 
 		return result, err
 	}
 
-	// Check unknown value range
+	// Only check unknown value range
 	if readingValueType == "int" || readingValueType == "uint" || readingValueType == "float32" || readingValueType == "float64" {
 		if !checkValueInRange(profileValueType, readingValueType, reading) {
 			err = fmt.Errorf("parse reading fail. Reading(%v) is out of the value type(%v)'s range", readingValueType, profileValueType)
@@ -419,193 +417,4 @@ func fetchCommandResponse(commandResponses map[string]string, cmdUuid string) (s
 	}
 
 	return cmdResponse, ok
-}
-
-func handleReadingStringValue(profileValueType string, readingValueType string, reading interface{}) (interface{}, string, error) {
-	if profileValueType == "string" && readingValueType != "string" {
-		reading = fmt.Sprintf("%v", reading)
-		readingValueType = "string"
-		return reading, readingValueType, nil
-	}
-
-	if profileValueType == "bool" && readingValueType == "string" {
-		reading, err := strconv.ParseBool(reading.(string))
-		readingValueType = "bool"
-		if err != nil {
-			err = fmt.Errorf("parse result fail. Reading's value (%v) can't parse to bool ,err:%v", reading, err)
-			return reading, readingValueType, err
-		} else {
-			return reading, readingValueType, nil
-		}
-	}
-
-	if strings.Contains(profileValueType, "uint") && readingValueType == "string" {
-		reading, err := strconv.ParseUint(reading.(string), 10, 64)
-		readingValueType = "uint"
-		if err != nil {
-			err = fmt.Errorf("parse result fail. Reading's value (%v) can't parse to uint ,err:%v", reading, err)
-			return reading, readingValueType, err
-		} else {
-			return reading, readingValueType, nil
-		}
-	}
-
-	if strings.Contains(profileValueType, "int") && readingValueType == "string" {
-		reading, err := strconv.ParseInt(reading.(string), 10, 64)
-		readingValueType = "int"
-		if err != nil {
-			err = fmt.Errorf("parse result fail. Reading's value (%v) can't parse to int ,err:%v", reading, err)
-			return reading, readingValueType, err
-		} else {
-			return reading, readingValueType, nil
-		}
-	}
-
-	if (profileValueType == "float32" || profileValueType == "float") && readingValueType == "string" {
-		val, err := strconv.ParseFloat(reading.(string), 32)
-		readingValueType = "float32"
-		if err != nil {
-			err = fmt.Errorf("parse result fail. Reading's value (%v) can't parse to float32 ,err:%v", reading, err)
-			return reading, readingValueType, err
-		} else {
-			reading = float32(val)
-			return reading, readingValueType, nil
-		}
-	}
-
-	if profileValueType == "float64" && readingValueType == "string" {
-		reading, err := strconv.ParseFloat(reading.(string), 64)
-		readingValueType = "float64"
-		if err != nil {
-			err = fmt.Errorf("parse result fail. Reading's value (%v) can't parse to float64 ,err:%v", reading, err)
-			return reading, readingValueType, err
-		} else {
-			return reading, readingValueType, nil
-		}
-
-	} else {
-		return reading, readingValueType, nil
-	}
-}
-
-func checkValueInRange(profileValueType string, readingValueType string, reading interface{}) bool {
-	isValid := false
-
-	switch profileValueType {
-	case "string":
-		isValid = true
-	case "bool":
-		isValid = true
-	case "uint8":
-		val := reading.(uint64)
-		if val >= 0 && val <= math.MaxUint8 {
-			isValid = true
-		}
-	case "uint16":
-		val := reading.(uint64)
-		if val >= 0 && val <= math.MaxUint16 {
-			isValid = true
-		}
-	case "uint32":
-		val := reading.(uint64)
-		if val >= 0 && val <= math.MaxUint32 {
-			isValid = true
-		}
-	case "uint64":
-		var val uint64
-		if readingValueType == "int" {
-			val = uint64(reading.(int64))
-		} else {
-			val = uint64(reading.(uint64))
-		}
-		maxiMum := uint64(math.MaxUint64)
-		if val >= 0 && val <= maxiMum {
-			isValid = true
-		}
-	case "int8":
-		val := reading.(int64)
-		if val >= math.MinInt8 && val <= math.MaxInt8 {
-			isValid = true
-		}
-	case "int16":
-		val := reading.(int64)
-		if val >= math.MinInt16 && val <= math.MaxInt16 {
-			isValid = true
-		}
-	case "int32":
-		val := reading.(int64)
-		if val >= math.MinInt32 && val <= math.MaxInt32 {
-			isValid = true
-		}
-	case "int64":
-		val := reading.(int64)
-		if val >= math.MinInt64 && val <= math.MaxInt64 {
-			isValid = true
-		}
-	case "float32":
-		var val float64
-		if readingValueType == "float32" {
-			val = (float64)(reading.(float32))
-		} else {
-			val = reading.(float64)
-		}
-		if val >= math.SmallestNonzeroFloat32 && val <= math.MaxFloat32 {
-			isValid = true
-		}
-	case "float64":
-		val := reading.(float64)
-		if val >= math.SmallestNonzeroFloat64 && val <= math.MaxFloat64 {
-			isValid = true
-		}
-	}
-
-	return isValid
-}
-
-func convertReadingValueType(profileValueType string, readingValueType string, reading interface{}) interface{} {
-	if readingValueType == "int" {
-		switch profileValueType {
-		case "int8":
-			reading = int8(reading.(int64))
-		case "int16":
-			reading = int16(reading.(int64))
-		case "int32":
-			reading = int32(reading.(int64))
-		case "int64":
-			reading = int64(reading.(int64))
-		case "uint8":
-			reading = uint8(reading.(int64))
-		case "uint16":
-			reading = uint16(reading.(int64))
-		case "uint32":
-			reading = uint32(reading.(int64))
-		case "uint64":
-			reading = uint64(reading.(int64))
-		}
-	} else if readingValueType == "uint" {
-		switch profileValueType {
-		case "int8":
-			reading = int8(reading.(uint64))
-		case "int16":
-			reading = int16(reading.(uint64))
-		case "int32":
-			reading = int32(reading.(uint64))
-		case "int64":
-			reading = int64(reading.(uint64))
-		case "uint8":
-			reading = uint8(reading.(uint64))
-		case "uint16":
-			reading = uint16(reading.(uint64))
-		case "uint32":
-			reading = uint32(reading.(uint64))
-		case "uint64":
-			reading = uint64(reading.(uint64))
-		}
-	} else if readingValueType == "float64" && profileValueType == "float32" {
-		reading = float32(reading.(float64))
-	} else if readingValueType == "float32" && profileValueType == "float64" {
-		reading = float64(reading.(float32))
-	}
-
-	return reading
 }

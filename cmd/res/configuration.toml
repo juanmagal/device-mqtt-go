@@ -46,7 +46,7 @@ FailWaitTime = 10
   MaxCmdValueLen = 256
   RemoveCmd = ""
   RemoveCmdArgs = ""
-  ProfilesDir = "./res/example"
+  ProfilesDir = ""
 
 [Logging]
 EnableRemote = false
@@ -54,20 +54,20 @@ File = "./device-mqtt.log"
 Level = "DEBUG"
 
 # Pre-define Devices
-[[DeviceList]]
-  Name = "MQTTtest"
-  Profile = "Test.Device.MQTT.Profile"
-  Description = "MQTT device is created for test purpose"
-  Labels = [ "MQTT", "test"]
-  [DeviceList.Addressable]
-    name = "Gateway address"
-    Protocol = "TCP"
-    Address = "0.0.0.0"
-    Port = 1883
-    Publisher = "CommandPublisher"
-    user = "admin"
-    password = "public"
-    topic = "CommandTopic"
+#[[DeviceList]]
+#  Name = "MQTTtest"
+#  Profile = "Test.Device.MQTT.Profile"
+#  Description = "MQTT device is created for test purpose"
+#  Labels = [ "MQTT", "test"]
+#  [DeviceList.Addressable]
+#    name = "Gateway address"
+#    Protocol = "TCP"
+#    Address = "0.0.0.0"
+#    Port = 1883
+#    Publisher = "CommandPublisher"
+#    user = "admin"
+#    password = "public"
+#    topic = "CommandTopic"
 
 # Pre-define Schedule Configuration
 #[[Schedules]]
