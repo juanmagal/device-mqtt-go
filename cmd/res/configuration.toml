@@ -1,6 +1,5 @@
-
 [Service]
-Host = "localhost"
+Host = "edgex-device-mqtt"
 Port = 49982
 ConnectRetries = 3
 Labels = []
@@ -11,7 +10,7 @@ EnableAsyncReadings = true
 AsyncBufferSize = 16
 
 [Registry]
-Host = "localhost"
+Host = "edgex-device-mqtt"
 Port = 8500
 CheckInterval = "10s"
 FailLimit = 3
