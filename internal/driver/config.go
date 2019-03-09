@@ -17,6 +17,7 @@ import (
 type configuration struct {
 	Incoming SubscribeInfo
 	Response SubscribeInfo
+        Metrics  MetricsInfo
 }
 type SubscribeInfo struct {
 	Protocol     string
@@ -28,6 +29,11 @@ type SubscribeInfo struct {
 	KeepAlive    int
 	MqttClientId string
 	Topic        string
+}
+type MetricsInfo struct {
+        Enabled     bool
+        Host        string
+        Port        string
 }
 
 // LoadConfigFromFile use to load toml configuration

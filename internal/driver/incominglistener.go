@@ -96,6 +96,10 @@ func onIncomingSenMLDataReceived(message senml.SenML) {
 		switch {
 		case v.Value != nil:
 			reading.RawValue = *v.Value
+                        if driver.Config.Metrics.Enabled {
+                                  driver.Logger.Info(fmt.Sprintf("Value = %v", string(int64(*v.Value))))
+                                  driver.MetricsClient.Gauge(v.BaseName+"."+v.Name,int64(*v.Value),1.0)
+                        }
 		case v.BoolValue != nil:
 			reading.RawValue = v.BoolValue
 		case v.DataValue != "":

@@ -1,6 +1,6 @@
 [Incoming]
 Protocol = "tcp"
-Host = "mosquitto"
+Host = "127.0.0.1"
 Port = 1883
 Username = "admin"
 Password = "public"
@@ -11,7 +11,7 @@ Topic = "DataTopic"
 
 [Response]
 Protocol = "tcp"
-Host = "mosquitto"
+Host = "127.0.0.1"
 Port = 1883
 Username = "admin"
 Password = "public"
@@ -19,3 +19,8 @@ Qos = 0
 KeepAlive = 3600
 MqttClientId = "CommandResponseSubscriber"
 Topic = "ResponseTopic"
+
+[Metrics]
+Enabled = true
+Host = "127.0.0.1"
+Port = "8125"

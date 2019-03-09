@@ -20,6 +20,8 @@ import (
 	"github.com/edgexfoundry/edgex-go/pkg/clients/logging"
 	"github.com/edgexfoundry/edgex-go/pkg/models"
 	"gopkg.in/mgo.v2/bson"
+        metrics "github.com/cactus/go-statsd-client/statsd"
+
 )
 
 var once sync.Once
@@ -28,6 +30,7 @@ var driver *Driver
 type Config struct {
 	Incoming connectionInfo
 	Response connectionInfo
+        Metrics  metricsInfo
 }
 
 type connectionInfo struct {
@@ -42,11 +45,19 @@ type connectionInfo struct {
 	MqttKeepAlive  int
 }
 
+type metricsInfo struct {
+        StatsdEnabled  bool
+        StatsdHost     string
+        StatsdPort     string
+}
+
+
 type Driver struct {
 	Logger           logger.LoggingClient
 	AsyncCh          chan<- *sdkModel.AsyncValues
 	CommandResponses map[string]string
 	Config           *configuration
+        MetricsClient    metrics.Statter
 }
 
 func NewProtocolDriver() sdkModel.ProtocolDriver {
@@ -80,6 +91,19 @@ func (d *Driver) Initialize(lc logger.LoggingClient, asyncCh chan<- *sdkModel.As
 			panic(fmt.Errorf("start incoming data Listener failed: %v", err))
 		}
 	}()
+
+        if d.Config.Metrics.Enabled {
+
+                driver.Logger.Info(fmt.Sprintf("Host %s %s",d.Config.Metrics.Host,d.Config.Metrics.Port))
+
+                metricsclient,err := StartMetrics(d.Config.Metrics.Host,d.Config.Metrics.Port)
+
+                if err != nil {
+                        panic(fmt.Errorf("connection to metrics statsd server failed: %v", err))
+                }
+
+                d.MetricsClient = metricsclient
+        }
 
 	return nil
 }
@@ -418,3 +442,5 @@ func fetchCommandResponse(commandResponses map[string]string, cmdUuid string) (s
 
 	return cmdResponse, ok
 }
+
+
